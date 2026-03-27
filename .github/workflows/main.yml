@@ -12,10 +12,10 @@ jobs:
         run: openssl genrsa -out developer_key.der 4096
 
       - name: Build App
-        uses: gruber-v/monkeyc-github-action@v1
+        uses: claneys/monkeyc-build-action@v2
         with:
           device: 'fr255'
-          developer_key_path: './developer_key.der'
+          developer_key: './developer_key.der'
 
       - name: Upload PRG
         uses: actions/upload-artifact@v4
