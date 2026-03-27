@@ -4,6 +4,8 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: florisfiedler/monkeyc-sdk:latest # Usiamo un'immagine pronta
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -12,10 +14,13 @@ jobs:
         run: openssl genrsa -out developer_key.der 4096
 
       - name: Build App
-        uses: floris-fiedler/monkeyc-build-action@v1
-        with:
-          device: 'fr255'
-          developer_key_path: './developer_key.der'
+        run: |
+          # Questo comando compila l'app "manualmente" nel cloud
+          monkeyc -o MetarFR255.prg \
+          -f monkey.jungle \
+          -y developer_key.der \
+          -d fr255 \
+          -w
 
       - name: Upload PRG
         uses: actions/upload-artifact@v4
