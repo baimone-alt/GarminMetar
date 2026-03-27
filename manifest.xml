@@ -1,5 +1,5 @@
 <iq:manifest xmlns:iq="http://www.garmin.com/jakarta/iq" version="3">
-    <iq:application id="a8d3e2f5-b6c7-49a1-bd12-8e7d9f6a2c3b" type="watch-app" name="MetarTaf_FR255" launcherIcon="@Drawables.LauncherIcon">
+    <iq:application id="a8d3e2f5-b6c7-49a1-bd12-8e7d9f6a2c3b" type="watch-app" name="MetarTaf_FR255">
         <iq:products>
             <iq:product id="fr255"/>
         </iq:products>
