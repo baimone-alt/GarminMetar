@@ -5,11 +5,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4  # Aggiornato per Node 24
+      - name: Checkout Code (Ufficiale)
+        uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4 # Aggiornato per Node 24
+      - name: Setup Java (Ufficiale)
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -17,16 +17,25 @@ jobs:
       - name: Generate Developer Key
         run: openssl genrsa -out developer_key.der 4096
 
-      - name: Build with Connect IQ
-        # Questa è l'unica Action ufficiale che GitHub non può bloccare
-        uses: achimbode/monkeyc-build-action@v1
-        with:
-          project_name: 'MetarApp'
-          device: 'fr255'
-          developer_key: './developer_key.der'
+      - name: Download SDK and Build
+        run: |
+          # 1. Scarichiamo l'SDK di Garmin (versione 7.1.0)
+          curl -L https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-7.1.0-2024-03-05-64d88e6.zip -o sdk.zip
+          unzip -q sdk.zip -d sdk
+          chmod +x sdk/bin/monkeyc
+          
+          # 2. Creiamo la cartella dei dispositivi (essenziale per l'errore 8)
+          mkdir -p ~/.Garmin/ConnectIQ/Devices/fr255
+          
+          # 3. Compiliamo (usando il percorso diretto)
+          ./sdk/bin/monkeyc -o MetarFR255.prg \
+          -f monkey.jungle \
+          -y developer_key.der \
+          -d fr255 \
+          -w
 
-      - name: Upload PRG
+      - name: Upload PRG (Ufficiale)
         uses: actions/upload-artifact@v4
         with:
           name: GarminApp_FR255
-          path: "**/*.prg"
+          path: ./*.prg
