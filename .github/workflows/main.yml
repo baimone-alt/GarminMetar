@@ -4,24 +4,36 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: florisfiedler/monkeyc-sdk:latest # Usiamo un'immagine pronta
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Generate Developer Key
         run: openssl genrsa -out developer_key.der 4096
 
-      - name: Build App
+      - name: Download Garmin SDK and Compile
         run: |
-          # Questo comando compila l'app "manualmente" nel cloud
-          monkeyc -o MetarFR255.prg \
+          # 1. Scarichiamo il compilatore direttamente da Garmin
+          wget -O sdk_manager.zip https://developer.garmin.com/downloads/connect-iq/sdk-manager/connectiq-sdk-manager-linux.zip
+          unzip sdk_manager.zip -d sdk_tools
+          
+          # 2. Scarichiamo l'SDK vero e proprio (versione stabile)
+          wget -O sdk.zip https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-7.1.0-2024-03-05-64d88e6.zip
+          unzip sdk.zip -d sdk
+          
+          # 3. Compiliamo usando il motore scaricato
+          ./sdk/bin/monkeyc -o MetarFR255.prg \
           -f monkey.jungle \
           -y developer_key.der \
           -d fr255 \
           -w
-
+          
       - name: Upload PRG
         uses: actions/upload-artifact@v4
         with:
