@@ -1,0 +1,25 @@
+name: Build Forerunner 255 App
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Generate Developer Key
+        run: openssl genrsa -out developer_key.der 4096
+
+      - name: Build App
+        uses: k-p-m/monkeyc-build-action@v1
+        with:
+          project_name: 'MetarFR255'
+          device: 'fr255'
+          developer_key: './developer_key.der'
+
+      - name: Upload PRG
+        uses: actions/upload-artifact@v3
+        with:
+          name: GarminApp_FR255
+          path: ./*.prg
