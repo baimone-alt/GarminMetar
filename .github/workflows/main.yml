@@ -12,7 +12,7 @@ jobs:
         run: openssl genrsa -out developer_key.der 4096
 
       - name: Build App
-        uses: gruber-v/monkeyc-build-action@v1
+        uses: gruber-v/monkeyc-github-action@v1
         with:
           device: 'fr255'
           developer_key_path: './developer_key.der'
