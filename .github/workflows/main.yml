@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Generate Developer Key
         run: openssl genrsa -out developer_key.der 4096
@@ -19,7 +19,7 @@ jobs:
           developer_key: './developer_key.der'
 
       - name: Upload PRG
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: GarminApp_FR255
           path: ./*.prg
