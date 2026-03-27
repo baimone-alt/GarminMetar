@@ -6,10 +6,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # Aggiornato per Node 24
 
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4 # Aggiornato per Node 24
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -17,25 +17,16 @@ jobs:
       - name: Generate Developer Key
         run: openssl genrsa -out developer_key.der 4096
 
-      - name: Download Garmin SDK and Compile
-        run: |
-          # 1. Scarichiamo il compilatore direttamente da Garmin
-          wget -O sdk_manager.zip https://developer.garmin.com/downloads/connect-iq/sdk-manager/connectiq-sdk-manager-linux.zip
-          unzip sdk_manager.zip -d sdk_tools
-          
-          # 2. Scarichiamo l'SDK vero e proprio (versione stabile)
-          wget -O sdk.zip https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-7.1.0-2024-03-05-64d88e6.zip
-          unzip sdk.zip -d sdk
-          
-          # 3. Compiliamo usando il motore scaricato
-          ./sdk/bin/monkeyc -o MetarFR255.prg \
-          -f monkey.jungle \
-          -y developer_key.der \
-          -d fr255 \
-          -w
-          
+      - name: Build with Connect IQ
+        # Questa è l'unica Action ufficiale che GitHub non può bloccare
+        uses: achimbode/monkeyc-build-action@v1
+        with:
+          project_name: 'MetarApp'
+          device: 'fr255'
+          developer_key: './developer_key.der'
+
       - name: Upload PRG
         uses: actions/upload-artifact@v4
         with:
           name: GarminApp_FR255
-          path: ./*.prg
+          path: "**/*.prg"
